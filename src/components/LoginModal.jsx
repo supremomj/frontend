@@ -12,6 +12,7 @@ const LoginModal = ({ onClose }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(false);
+  const [userType, setUserType] = useState(null); // Tracks whether user is Employee or Employer
   const termsRef = useRef(null);
 
   // Detect scroll position in Terms & Conditions
@@ -56,65 +57,74 @@ const LoginModal = ({ onClose }) => {
           <FiX size={24} />
         </button>
 
-        {/* Login / Sign Up Form with Animation */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={isSignUp ? "signup" : "login"}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            variants={modalVariants}
-          >
-            {/* Title */}
-            <h2 className="text-2xl font-bold text-center mb-4">{isSignUp ? "Sign Up" : "Log In"}</h2>
-
-            <form className="flex flex-col gap-4">
-              {isSignUp && (
-                <>
-                  <input type="text" placeholder="Full Name" className="border p-2 rounded-md" required />
-                  <input type="tel" placeholder="Phone Number" className="border p-2 rounded-md" required />
-                  <select className="border p-2 rounded-md" required>
-                    <option value="">Select Role</option>
-                    <option value="employee">Employee</option>
-                    <option value="employer">Employer</option>
-                  </select>
-                </>
-              )}
-              <input type="email" placeholder="Email" className="border p-2 rounded-md" required />
-              {isSignUp && <input type="email" placeholder="Confirm Email" className="border p-2 rounded-md" required />}
-              <input type="password" placeholder="Password" className="border p-2 rounded-md" required />
-              {isSignUp && <input type="password" placeholder="Confirm Password" className="border p-2 rounded-md" required />}
-
-              {isSignUp && (
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" required />
-                  <span className="text-sm">
-                    I agree to the{" "}
-                    <span className="text-blue-500 cursor-pointer underline" onClick={() => setShowTerms(true)}>
-                      Terms & Conditions
-                    </span>
-                  </span>
-                </div>
-              )}
-
-              <button className="mt-4 bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-3 rounded-full shadow-lg hover:from-red-600 hover:to-orange-600 transition duration-300">
-                {isSignUp ? "Sign Up" : "Log In"}
-              </button>
-            </form>
-
-            {/* Toggle Between Login & Sign Up */}
-            <p className="text-sm text-center mt-2">
-              {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-              <span className="text-blue-500 cursor-pointer" onClick={() => setIsSignUp(!isSignUp)}>
-                {isSignUp ? " Log in" : " Sign up"}
-              </span>
-            </p>
+        {/* Role Selection Before Login */}
+        {!userType ? (
+          <motion.div key="role-selection" initial="hidden" animate="visible" exit="exit" variants={modalVariants}>
+            <h2 className="text-2xl font-bold text-center mb-4">Select Your Role</h2>
+            <div className="flex flex-col gap-4">
+            <button
+               onClick={() => setUserType("employee")}
+                className="mt-6 bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-3 rounded-full shadow-lg hover:from-red-600 hover:to-orange-600 transition duration-300">
+                 Employee
+            </button>
+            <button
+                onClick={() => setUserType("employer")}
+                 className="mt-6 bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-3 rounded-full shadow-lg hover:from-red-600 hover:to-orange-600 transition duration-300">
+                  Employer
+            </button>
+            </div>
           </motion.div>
-        </AnimatePresence>
-      </motion.div>
+        ) : (
+          // Login / Sign Up Form with Animation
+          <AnimatePresence mode="wait">
+            <motion.div key={isSignUp ? "signup" : "login"} initial="hidden" animate="visible" exit="exit" variants={modalVariants}>
+              {/* Title */}
+              <h2 className="text-2xl font-bold text-center mb-4">
+                {isSignUp ? "Sign Up" : `Log In as ${userType.charAt(0).toUpperCase() + userType.slice(1)}`}
+              </h2>
 
-      {/* Terms & Conditions Modal */}
-      {showTerms && (
+              <form className="flex flex-col gap-4">
+                {isSignUp && (
+                  <>
+                    <input type="text" placeholder="Full Name" className="border p-2 rounded-md" required />
+                    <input type="tel" placeholder="Phone Number" className="border p-2 rounded-md" required />
+                  </>
+                )}
+                <input type="email" placeholder="Email" className="border p-2 rounded-md" required />
+                {isSignUp && <input type="email" placeholder="Confirm Email" className="border p-2 rounded-md" required />}
+                <input type="password" placeholder="Password" className="border p-2 rounded-md" required />
+                {isSignUp && <input type="password" placeholder="Confirm Password" className="border p-2 rounded-md" required />}
+
+                {isSignUp && (
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" required />
+                    <span className="text-sm">
+                      I agree to the{" "}
+                      <span className="text-blue-500 cursor-pointer underline" onClick={() => setShowTerms(true)}>
+                        Terms & Conditions
+                      </span>
+                    </span>
+                  </div>
+                )}
+
+                <button className="mt-4 bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-3 rounded-full shadow-lg hover:from-red-600 hover:to-orange-600 transition duration-300">
+                  {isSignUp ? "Sign Up" : "Log In"}
+                </button>
+              </form>
+
+              {/* Toggle Between Login & Sign Up */}
+              <p className="text-sm text-center mt-2">
+                {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+                <span className="text-blue-500 cursor-pointer" onClick={() => setIsSignUp(!isSignUp)}>
+                  {isSignUp ? " Log in" : " Sign up"}
+                </span>
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        )}
+      </motion.div>
+ {/* Terms & Conditions Modal */}
+ {showTerms && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <motion.div
             initial="hidden"
@@ -173,4 +183,4 @@ const LoginModal = ({ onClose }) => {
   );
 };
 
-export default LoginModal;
+export default LoginModal; 
